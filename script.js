@@ -57,6 +57,7 @@ function escapeHtml(value) {
   })[character]);
 }
 
+
 function renderProjects(serviceKey) {
   const service = portfolioServices[serviceKey];
   if (!service || !projectGrid) return;
@@ -69,43 +70,123 @@ function renderProjects(serviceKey) {
     button.setAttribute('aria-pressed', String(selected));
   });
 
-  if (projectKicker) projectKicker.textContent = `${service.number} / ${service.title.toUpperCase()}`;
+  if (projectKicker) {
+    projectKicker.textContent =
+      `${service.number} / ${service.title.toUpperCase()}`;
+  }
+
   if (projectTitle) projectTitle.textContent = service.title;
   if (projectDescription) projectDescription.textContent = service.description;
-  if (projectCount) projectCount.textContent = `${String(service.projects.length).padStart(2, '0')} PROJECTS`;
+
+  if (projectCount) {
+    projectCount.textContent =
+      `${String(service.projects.length).padStart(2, '0')} PROJECTS`;
+  }
 
   projectGrid.innerHTML = service.projects.map((project, index) => `
-    <article class="project-card${index >= visibleLimit ? ' hidden' : ''}" style="--project-accent: ${escapeHtml(project.accent)}">
-      <button class="project-image project-open" type="button" data-service="${escapeHtml(serviceKey)}" data-project-index="${index}" aria-label="View ${escapeHtml(project.title)} project details">
+    <article class="project-card${index >= visibleLimit ? ' hidden' : ''}"
+      style="--project-accent: ${escapeHtml(project.accent || '#f59e0b')}">
+
+      <button class="project-image project-open"
+        type="button"
+        data-service="${escapeHtml(serviceKey)}"
+        data-project-index="${index}"
+        aria-label="View ${escapeHtml(project.title)} project details">
+
         <span class="project-thumbnail">
-          <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)} project preview" loading="lazy" decoding="async">
-          <span class="thumbnail-fallback" aria-hidden="true">${escapeHtml(project.title)}</span>
-          <span class="project-image-overlay"><span>VIEW PROJECT</span><span class="overlay-arrow">↗</span></span>
+          <img
+            src="${escapeHtml(project.image)}"
+            alt="${escapeHtml(project.title)} project preview"
+            loading="lazy"
+            decoding="async">
+
+          <span class="thumbnail-fallback" aria-hidden="true">
+            ${escapeHtml(project.title)}
+          </span>
+
+          <span class="project-image-overlay">
+            <span>VIEW PROJECT</span>
+            <span class="overlay-arrow">↗</span>
+          </span>
         </span>
       </button>
+
       <div class="project-meta">
-        <div><h4>${escapeHtml(project.title)}</h4><p>${escapeHtml(project.subtitle)}</p></div>
+        <div>
+          <h4>${escapeHtml(project.title)}</h4>
+          <p>${escapeHtml(project.subtitle || project.category || '')}</p>
+        </div>
         <span class="project-arrow" aria-hidden="true">↗</span>
       </div>
     </article>
   `).join('');
 
-  // The homepage previews up to five projects; the link opens a dedicated page with the full service gallery.
-  const hasMoreProjects = service.projects.length > INITIAL_PROJECTS_VISIBLE;
-  if (exploreMoreWrap) exploreMoreWrap.hidden = !hasMoreProjects;
-  if (exploreMoreButton) {
-    exploreMoreButton.href = servicePageSlugs[serviceKey] || `service-work.html?service=${encodeURIComponent(serviceKey)}`;
-    exploreMoreButton.setAttribute('aria-label', `Explore all ${service.title} projects`);
-  }
-  if (exploreMoreLabel) exploreMoreLabel.textContent = `Explore all ${service.title} projects`;
-  if (exploreMoreIcon) exploreMoreIcon.textContent = '↗';
-  if (projectGalleryStatus) {
-    const shown = Math.min(INITIAL_PROJECTS_VISIBLE, service.projects.length);
-    projectGalleryStatus.textContent = `Showing ${shown} of ${service.projects.length} projects · Open the full gallery to explore more`;
+  // Update the Explore More link.
+  const hasMoreProjects =
+    service.projects.length > INITIAL_PROJECTS_VISIBLE;
+
+  if (exploreMoreWrap) {
+    exploreMoreWrap.hidden = !hasMoreProjects;
   }
 
-  // If a remote sample image does not load, the card still displays a designed placeholder.
+  if (exploreMoreButton) {
+    exploreMoreButton.href =
+      servicePageSlugs[serviceKey] ||
+      `service-work.html?service=${encodeURIComponent(serviceKey)}`;
+
+    exploreMoreButton.setAttribute(
+      'aria-label',
+      `Explore all ${service.title} projects`
+    );
+  }
+
+  if (exploreMoreLabel) {
+    exploreMoreLabel.textContent =
+      `Explore all ${service.title} projects`;
+  }
+
+  if (exploreMoreIcon) {
+    exploreMoreIcon.textContent = '↗';
+  }
+
+  if (projectGalleryStatus) {
+    const shown = Math.min(
+      INITIAL_PROJECTS_VISIBLE,
+      service.projects.length
+    );
+
+    projectGalleryStatus.textContent =
+      `Showing ${shown} of ${service.projects.length} projects · Open the full gallery to explore more`;
+  }
+
+  // Detect each image's actual proportions.
   projectGrid.querySelectorAll('.project-thumbnail img').forEach((image) => {
+    const applyImageFormat = () => {
+      if (!image.naturalWidth || !image.naturalHeight) return;
+
+      const format = detectImageFormat(image);
+      const thumbnail = image.closest('.project-thumbnail');
+
+      if (thumbnail) {
+        thumbnail.classList.remove(
+          'square',
+          'portrait',
+          'landscape',
+          'a4-portrait',
+          'a4-landscape'
+        );
+
+        thumbnail.classList.add(format);
+      }
+    };
+
+    if (image.complete && image.naturalWidth > 0) {
+      applyImageFormat();
+    } else {
+      image.addEventListener('load', applyImageFormat, { once: true });
+    }
+
+    // Preserve the image fallback if loading fails.
     image.addEventListener('error', () => {
       image.classList.add('image-missing');
       image.closest('.project-thumbnail')?.classList.add('has-fallback');
@@ -113,37 +194,118 @@ function renderProjects(serviceKey) {
     }, { once: true });
   });
 
+  // Open the selected project.
   projectGrid.querySelectorAll('.project-open').forEach((button) => {
     button.addEventListener('click', () => {
-      const selectedService = portfolioServices[button.dataset.service];
-      const project = selectedService?.projects[Number(button.dataset.projectIndex)];
-      if (project) openProjectDialog(selectedService, project);
+      const selectedService =
+        portfolioServices[button.dataset.service];
+
+      const project =
+        selectedService?.projects[
+          Number(button.dataset.projectIndex)
+        ];
+
+      if (project) {
+        openProjectDialog(selectedService, project);
+      }
     });
   });
 
-  observeRevealElements(projectGrid.querySelectorAll('.project-card:not(.hidden)'));
+  // Animate visible project cards.
+  observeRevealElements(
+    projectGrid.querySelectorAll('.project-card:not(.hidden)')
+  );
 }
+  
+
+
+  // Detect each project's actual image proportions.
+  projectGrid.querySelectorAll('.project-thumbnail img').forEach((image) => {
+    const applyImageFormat = () => {
+      if (!image.naturalWidth || !image.naturalHeight) return;
+
+      const format = detectImageFormat(image);
+      const thumbnail = image.closest('.project-thumbnail');
+
+      if (thumbnail) {
+        thumbnail.classList.remove(
+          'square',
+          'portrait',
+          'landscape',
+          'a4-portrait',
+          'a4-landscape'
+        );
+
+        thumbnail.classList.add(format);
+      }
+    };
+
+    // Handle images that have already loaded.
+    if (image.complete && image.naturalWidth > 0) {
+      applyImageFormat();
+    } else {
+      // Handle images that load afterwards.
+      image.addEventListener('load', applyImageFormat, { once: true });
+    }
+
+    // Keep the existing fallback for images that fail to load.
+    image.addEventListener('error', () => {
+      image.classList.add('image-missing');
+      image.closest('.project-thumbnail')?.classList.add('has-fallback');
+      image.removeAttribute('src');
+    }, { once: true });
+  });
 
 function openProjectDialog(service, project) {
   if (!projectDialog) return;
-  dialogKicker.textContent = `${service.title.toUpperCase()} / SELECTED PROJECT`;
+
+  dialogKicker.textContent =
+    `${service.title.toUpperCase()} / SELECTED PROJECT`;
+
   dialogTitle.textContent = project.title;
   dialogDescription.textContent = project.description;
+
   dialogImage.src = project.image;
   dialogImage.alt = `${project.title} project preview`;
+
   dialogImage.onerror = () => {
     dialogImage.removeAttribute('src');
-    dialogImage.alt = `${project.title} preview image unavailable. Replace the temporary image URL in script.js.`;
+    dialogImage.alt = `${project.title} preview image unavailable`;
   };
-  if (typeof projectDialog.showModal === 'function') projectDialog.showModal();
-  else projectDialog.setAttribute('open', 'open');
+
+  // Choose the presentation viewer or the standard cover image.
+  setupPresentation(service, project);
+
+  if (typeof projectDialog.showModal === 'function') {
+    projectDialog.showModal();
+  } else {
+    projectDialog.setAttribute('open', 'open');
+  }
 }
 
 serviceButtons.forEach((button) => {
   button.addEventListener('click', () => {
-    renderProjects(button.dataset.service);
+    const serviceKey = button.dataset.service;
+
+    // Confirm that the selected service exists
+    if (!portfolioServices[serviceKey]) {
+      console.error('Service not found:', serviceKey);
+      return;
+    }
+
+    // Update selected button styling and accessibility state
+    serviceButtons.forEach((item) => {
+      const isActive = item === button;
+
+      item.classList.toggle('active', isActive);
+      item.setAttribute('aria-pressed', String(isActive));
+    });
+
+    // Render the selected service's projects
+    renderProjects(serviceKey);
   });
 });
+
 
 if (projectDialog) {
   const closeButton = projectDialog.querySelector('.dialog-close');
@@ -189,3 +351,136 @@ renderProjects('logo-design');
 // Keep the footer year current.
 const yearElement = document.getElementById('year');
 if (yearElement) yearElement.textContent = new Date().getFullYear();
+
+const presentationState = {
+  slides: [],
+  index: 0
+};
+
+function setupPresentation(service, project) {
+  const box = document.getElementById('brand-presentation');
+  const standardMedia = document.getElementById('standard-project-media');
+  const slideImage = document.getElementById('presentation-slide');
+  const counter = document.getElementById('slide-counter');
+  const dots = document.getElementById('presentation-dots');
+  const prev = document.getElementById('slide-prev');
+  const next = document.getElementById('slide-next');
+  const pdfButton = document.getElementById('view-pdf');
+
+  if (!box || !standardMedia || !slideImage) return;
+
+  const serviceKey = Object.keys(portfolioServices).find(
+    key => portfolioServices[key] === service
+  );
+
+  const allowedServices = [
+    'brand-identity',
+    'visual-branding'
+  ];
+
+  const slides = Array.isArray(project.slides) && project.slides.length
+    ? project.slides
+    : [];
+
+  const showPresentation =
+    allowedServices.includes(serviceKey) &&
+    project.presentation === true &&
+    slides.length > 0;
+
+  box.hidden = !showPresentation;
+  standardMedia.hidden = showPresentation;
+
+  if (!showPresentation) {
+    pdfButton.hidden = true;
+    return;
+  }
+
+  presentationState.slides = slides;
+  presentationState.index = 0;
+
+  // PDF links are available for Brand Identity projects only.
+  const pdf = serviceKey === 'brand-identity'
+    ? project.pdf
+    : '';
+
+  pdfButton.hidden = !pdf;
+
+  if (pdf) {
+    pdfButton.href = pdf;
+  } else {
+    pdfButton.removeAttribute('href');
+  }
+
+  function renderSlide() {
+    const current = presentationState.index;
+    const total = presentationState.slides.length;
+
+    slideImage.src = presentationState.slides[current];
+    slideImage.alt =
+      `${project.title} — presentation slide ${current + 1}`;
+
+    slideImage.onerror = () => {
+      console.error('Could not load presentation image:', slideImage.src);
+    };
+
+    counter.textContent =
+      `${String(current + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+
+    dots.replaceChildren();
+
+    presentationState.slides.forEach((src, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'presentation-dot' +
+        (index === current ? ' active' : '');
+      dot.setAttribute('aria-label', `View slide ${index + 1}`);
+
+      dot.addEventListener('click', () => {
+        presentationState.index = index;
+        renderSlide();
+      });
+
+      dots.appendChild(dot);
+    });
+
+    prev.disabled = total <= 1;
+    next.disabled = total <= 1;
+  }
+
+  prev.onclick = () => {
+    const total = presentationState.slides.length;
+    presentationState.index =
+      (presentationState.index - 1 + total) % total;
+    renderSlide();
+  };
+
+  next.onclick = () => {
+    const total = presentationState.slides.length;
+    presentationState.index =
+      (presentationState.index + 1) % total;
+    renderSlide();
+  };
+
+  renderSlide();
+}
+
+
+function detectImageFormat(img) {
+  const width = img.naturalWidth;
+  const height = img.naturalHeight;
+  const ratio = width / height;
+
+  if (Math.abs(ratio - 210 / 297) < 0.04) {
+    return "a4-portrait";
+  }
+
+  if (Math.abs(ratio - 297 / 210) < 0.04) {
+    return "a4-landscape";
+  }
+
+  if (Math.abs(ratio - 1) < 0.04) {
+    return "square";
+  }
+
+  return ratio > 1 ? "landscape" : "portrait";
+}

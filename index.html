@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="testimonials.css">
 </head>
 <body>
 
@@ -23,10 +24,9 @@
 <header class="site-header" id="top">
   <nav class="nav container" aria-label="Main navigation">
 
-    <!-- PNG brand logo -->
     <a class="brand" href="#top" aria-label="Dangton Designs home">
       <img
-        src="images/DANGTON%20DESIGN%20PRIMARY%20LOGO-01-03.png"
+        src="Images/DANGTON DESIGNS PRIMARY LOGO-01.png"
         alt="Dangton Designs"
         class="header-logo"
       >
@@ -43,9 +43,10 @@
 
     <div class="nav-links">
       <a href="#about">About</a>
-      <a href="#work">Work</a>
-      <a href="#services">Services</a>
       <a href="#portfolio">Portfolio</a>
+      <a href="#services">Services</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#process">Process</a>
       <a class="nav-cta" href="#contact">
         Let's talk <span>↗</span>
       </a>
@@ -75,20 +76,20 @@
 <div class="brandmark-watermark" aria-hidden="true">
   <img
     src="Images/DANGTON%20DESIGN%20BRANDMARK%20LOGO-02.png"
-    alt=""
+    alt="Dangton Designs BrandMark Logo"
   >
 </div>
 
 <!-- Floating brand mark badge -->
 <div class="brandmark-badge" aria-hidden="true">
   <img
-    src="Images/DANGTON%20DESIGN%20BRANDMARK%20LOGO-02.png"
-    alt=""
+    src="Images/DANGTON DESIGNS BRANDMARK LOGO-01-01.png"
+    alt="Dangton Designs BrandMark Logo"
   >
 </div>
 
 
-  <!-- Your portrait image -->
+  <!-- My Portrait image -->
   
 <div class="portrait-frame">
 
@@ -210,28 +211,102 @@
     <section class="process-section" id="process"><div class="container"><div class="section-heading"><div><p class="eyebrow"><span class="eyebrow-line"></span> The way we work</p><h2>Clear steps.<br><em>Better outcomes.</em></h2></div><p class="section-aside">A collaborative process that keeps the work focused, the communication open and the purpose clear.</p></div>
       <div class="process-grid"><article><span>01</span><h3>Discover</h3><p>We discuss your goals, audience, challenges and what success should look like.</p></article><article><span>02</span><h3>Define</h3><p>We agree on the direction, deliverables, timeline and scope before design begins.</p></article><article><span>03</span><h3>Design</h3><p>I develop the creative work, share progress and refine it with your feedback.</p></article><article><span>04</span><h3>Deliver</h3><p>You receive the final assets and practical guidance for putting them to work.</p></article></div>
     </div></section>
+<!-- Project dialog: keep only ONE copy -->
+<dialog class="project-dialog" id="project-dialog"
+  aria-labelledby="dialog-title">
+
+  <button class="dialog-close" type="button"
+    aria-label="Close project details">×</button>
+
+  <!-- Presentation viewer: cover and slides appear here -->
+  <div class="brand-presentation" id="brand-presentation" hidden>
+
+    <div class="presentation-heading">
+      <span>BRAND PRESENTATION</span>
+      <span id="slide-counter">01 / 01</span>
+    </div>
+
+    <div class="presentation-stage">
+      <button type="button" class="slide-arrow slide-prev"
+        id="slide-prev" aria-label="Previous slide">
+        &#8592;
+      </button>
+
+      <img id="presentation-slide" src=""
+        alt="Project presentation">
+
+      <button type="button" class="slide-arrow slide-next"
+        id="slide-next" aria-label="Next slide">
+        &#8594;
+      </button>
+    </div>
+
+    <div class="presentation-dots" id="presentation-dots"></div>
+
+    <a id="view-pdf" class="pdf-button" href="#"
+      target="_blank" rel="noopener" hidden>
+      View Full Brand Guidelines (PDF) <span>&#8599;</span>
+    </a>
+
+  </div>
+
+  <!-- Standard image for projects without presentations -->
+  <div class="dialog-media" id="standard-project-media">
+    <img id="dialog-image" src="" alt="">
+  </div>
+
+  <!-- Project information -->
+  <div class="dialog-content">
+    <p class="dialog-kicker" id="dialog-kicker">
+      PROJECT / SERVICE
+    </p>
+
+    <h2 id="dialog-title">Project title</h2>
+
+    <p id="dialog-description">
+      Project details will appear here.
+    </p>
+
+    <a class="button button-primary dialog-contact" href="#contact">
+      Discuss a similar project
+    </a>
+  </div>
+
+</dialog>
+
+
+<section class="testimonials-section" id="testimonials">
+  <div class="testimonials-heading">
+    <span class="testimonials-eyebrow">Client Experiences</span>
+    <h2>Words From Our Clients.</h2>
+    <p>
+      Every project is a collaboration. Discover what clients
+      have to say about their experience with Dangton Designs.
+    </p>
+  </div>
+
+  <div data-testimonials data-testimonial-mode="preview"></div>
+
+  <div class="testimonials-cta">
+    <a href="testimonials.html">View All Testimonials ↗</a>
+  </div>
+</section>
+
 
     <section class="contact-section" id="contact"><div class="container contact-inner"><div><p class="eyebrow"><span class="eyebrow-line"></span> Have a project in mind?</p><h2>Let's make your<br>next move <em>matter.</em></h2><p class="contact-copy">Tell me what you're building, what you need, or where you're stuck. We'll take it from there.</p></div><div class="contact-panel"><p class="panel-label">START A CONVERSATION</p><a class="contact-email" href="mailto:info@dangtondesigns.co.za">info@dangtondesigns.co.za <span>↗</span></a><p class="contact-small">Prefer a quick message? Reach out on WhatsApp and tell me a little about your project.</p><a class="button button-primary button-wide" href="https://wa.me/+27736691886" target="_blank" rel="noopener">Message on WhatsApp <span>↗</span></a><p class="contact-small tiny">I respond to messages as quickly as possible, but please allow 5–12 hours for a reply. I look forward to connecting with you.</p></div></div></section>
 
-  <dialog class="project-dialog" id="project-dialog" aria-labelledby="dialog-title">
-    <button class="dialog-close" type="button" aria-label="Close project details">×</button>
-    <div class="dialog-media"><img id="dialog-image" alt=""></div>
-    <div class="dialog-content">
-      <p class="dialog-kicker" id="dialog-kicker">PROJECT / SERVICE</p>
-      <h2 id="dialog-title">Project title</h2>
-      <p id="dialog-description">Project details will appear here.</p>
-      <a class="button button-primary dialog-contact" href="#contact">Discuss a similar project <span>↗</span></a>
-    </div>
-  </dialog>
 
   <footer class="footer"><div class="container footer-top"><a class="brand" href="#top" aria-label="Dangton Designs home">
       <img
-        src="images/DANGTON%20DESIGN%20PRIMARY%20LOGO-01-06.png"
+        src="Images/DANGTON DESIGNS PRIMARY LOGO-03.png"
         alt="Dangton Designs"
         class="footer-logo"
       >
     </a><p>Good design. Clear purpose. Lasting impact.</p><a href="#top" class="back-top">Back to top ↑</a></div><div class="container footer-bottom"><span>© <span id="year"></span> Dangton Designs. All rights reserved.</span><div><a href="https://x.com/Dangton_Phphira/" target="_blank" rel="noopener">Twitter ↗</a><a href="https://www.instagram.com/dangton_designs/" target="_blank" rel="noopener">Instagram ↗</a><a href="https://www.behance.net/dangtondesigns/" target="_blank" rel="noopener">Behance ↗</a><a href="https://www.linkedin.com/in/dangton-phiphira/" target="_blank" rel="noopener">LinkedIn ↗</a></div><span>Designed with intention.</span></div></footer>
   <script src="portfolio-data.js"></script>
   <script src="script.js"></script>
+
+  <script src="testimonials-data.js"></script>
+  <script src="testimonials.js"></script>
 </body>
 </html>
